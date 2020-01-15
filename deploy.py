@@ -108,7 +108,7 @@ def upload_to_dropbox(target_file_name, source_file, dropbox_token, dropbox_fold
     return re.sub('dl=.*', 'raw=1', r.json()['url'])
 
 
-def send_email(zapier_hook, to, subject, body):
+def send_email(zapier_hook, to, subject, body,file_url):
     '''Send email with zapier hook
     
     Args:
@@ -130,7 +130,7 @@ def send_email(zapier_hook, to, subject, body):
                     }
                   ],
                   "dynamic_template_data":{
-                      "dropbox_url":"https://www.cmsjunkie.com/j-businessdirectory-mobile-app"	
+                      "dropbox_url":file_url	
                     }
                 }
               ],
@@ -142,7 +142,7 @@ def send_email(zapier_hook, to, subject, body):
     
     try:
         sg = SendGridAPIClient(options.sendgrid_key)
-        response = sg.send(message)
+        response = sg.client.mail.send.post(request_body=data)
         print(response.status_code)
         print(response.body)
         print(response.headers)
@@ -303,5 +303,5 @@ if __name__ == '__main__':
         exit(TEMPLATE_ERROR_CODE)
     
     # Send email with release data
-    if not send_email(options.zapier_hook, options.email_to, subject, body):
+    if not send_email(options.zapier_hook, options.email_to, subject, body,file_url):
         exit(ZAPIER_ERROR_CODE)
