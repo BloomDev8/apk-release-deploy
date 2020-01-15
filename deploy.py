@@ -149,7 +149,7 @@ def send_email(zapier_hook, to, subject, body,file_url):
     except Exception as e:
         print(e.message)
 
-    return r.status_code == response.status_code
+    return  response.status_code
 
 
 def get_app(release_dir):
