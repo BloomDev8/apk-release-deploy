@@ -21,7 +21,10 @@ import argparse
 import requests
 import json
 import re
-
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+    
 DROPBOX_ERROR_CODE = 1
 ZAPIER_ERROR_CODE = 2
 TEMPLATE_ERROR_CODE = 3
@@ -117,15 +120,36 @@ def send_email(zapier_hook, to, subject, body):
     Returns:
         bool: Send success/fail.
     '''
-    ZAPIER_SEND_DATA['to'] = to
-    ZAPIER_SEND_DATA['subject'] = subject
-    ZAPIER_SEND_DATA['body'] = body
+   
+    data = {
+              "personalizations": [
+                {
+                  "to": [
+                    {
+                      "email": to
+                    }
+                  ],
+                  "dynamic_template_data":{
+                      "dropbox_url":"https://www.cmsjunkie.com/j-businessdirectory-mobile-app"	
+                    }
+                }
+              ],
+              "from": {
+                "email": "support@cmsjunkie.com"
+              },
+              "template_id":"d-198dab68ea0041b8b22ff2a3bc34b707"
+            }
+    
+    try:
+        sg = SendGridAPIClient(options.sendgrid_key)
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
 
-    headers = {'Content-Type': 'application/json'}
-
-    r = requests.post(zapier_hook, data=json.dumps(ZAPIER_SEND_DATA), headers=headers)
-
-    return r.status_code == requests.codes.ok
+    return r.status_code == response.status_code
 
 
 def get_app(release_dir):
@@ -252,6 +276,7 @@ if __name__ == '__main__':
     parser.add_argument('--dropbox.folder', dest='dropbox_folder', help='dropbox target folder', required=True)
     parser.add_argument('--zapier.hook', dest='zapier_hook', help='zapier email web hook', required=True)
     parser.add_argument('--email.to', dest='email_to', help='email recipients', required=True)
+    parser.add_argument('--sendgrid.key', dest='sendgrid_key', help='send mail via API', required=True)
 
     options = parser.parse_args()
 
