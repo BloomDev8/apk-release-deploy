@@ -152,7 +152,7 @@ def send_email(zapier_hook, to, subject, body,file_url):
     return  response.status_code
 
 
-def get_app(release_dir):
+def get_app(release_dir,release_apk_dir):
     '''Extract app data
     
     Args:
@@ -161,7 +161,7 @@ def get_app(release_dir):
     Returns:
         (str, str): App version and path to release apk file.
     '''
-    output_path = os.path.join(release_dir, 'output-metadata.json')
+    output_path = os.path.join(release_apk_dir, 'output-metadata.json')
 
     with(open(output_path)) as app_output:
         json_data = json.load(app_output)
@@ -260,6 +260,7 @@ if __name__ == '__main__':
     # Command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--release.dir', dest='release_dir', help='path to release folder', required=True)
+    parser.add_argument('--release.apk.dir', dest='release_apk_dir', help='path to release folder', required=True)
     parser.add_argument('--app.name', dest='app_name', help='app name that will be used as file name', required=True)
     parser.add_argument('--changelog.file', dest='changelog_file', help='path to changelog file', required=True)
     parser.add_argument('--template.file', dest='template_file', help='path to email template file', required=True)
@@ -272,7 +273,7 @@ if __name__ == '__main__':
     options = parser.parse_args()
 
     # Extract app version and file
-    app_version, app_file = get_app(options.release_dir)
+    app_version, app_file = get_app(options.release_dir,options.release_apk_dir)
     if app_version == None or app_file == None:
         exit(OUTPUT_FILE_PARSING_ERROR)
     
