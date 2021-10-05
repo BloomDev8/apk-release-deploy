@@ -168,6 +168,7 @@ def get_app(release_dir,release_apk_dir):
 
     app_version = json_data['elements'][0]['versionName']
     app_file = os.path.join(release_dir, json_data['elements'][0]['outputFile'])
+    app_file.replace('.apk', '.aab')
     return app_version, app_file
 
 
