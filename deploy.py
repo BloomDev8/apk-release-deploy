@@ -22,6 +22,8 @@ import requests
 import json
 import re
 import os
+import certifi
+import ssl
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
     
